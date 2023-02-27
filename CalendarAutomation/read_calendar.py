@@ -41,8 +41,8 @@ class UserAccount:
 
 def main():
     email = input("Enter your full email address: ")        # e.g. "mandeep.khadka@rwth-aachen.de"
-    userID = input("Enter your User ID: ")                  # e.g. "bk247056"
-    password = getpass("Enter your password: ")              # e.g. "6507!rwthA"
+    userID = input("Enter your User ID: ")                  # e.g. "bk******"
+    password = getpass("Enter your password: ")             # e.g. "top_secret_123"
 
     account = UserAccount(email, userID, password)
     is_account_valid = account.verify_account()
