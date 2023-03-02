@@ -1,5 +1,7 @@
 import sys
 import time
+from getpass import getpass
+
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
@@ -8,17 +10,20 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import Select
 from webdriver_manager.chrome import ChromeDriverManager
 
-num_choices_date = 0
-if len(sys.argv) < 2:
-  raise Exception("Must provide at least one date parameter.")
-elif len(sys.argv) == 2:
-    begin_date = sys.argv[1]
-    num_choices_date = 1
-elif len(sys.argv) == 3:
-    begin_date = sys.argv[1]
-    num_choices_date = int(sys.argv[2])
-else:
-    raise Exception("Unknown error encountered.")
+### user-defined modules ###
+import read_calendar as owa
+
+email = input("Enter your full email address: ")            # e.g. "mandeep.khadka@rwth-aachen.de"
+userID = input("Enter your User ID: ")                      # e.g. "bk******"
+password = getpass("Enter your password: ")
+
+account = owa.UserAccount(email, userID, password)
+is_account_valid = account.verify_account()
+if is_account_valid:
+    booking_name = input("Enter given name of your booking: ")  # e.g. "SampleBlockedSlot"
+    bookings = account.get_calendar_named_bookings(booking_name)
+    print(bookings)
+num_choices_date = len(bookings['date'])
 
 options = Options()
 options.add_experimental_option("detach", True)
@@ -59,7 +64,8 @@ for link in links:
 time.sleep(1)   # allow the new page to load after clicking
 new_page = driver.window_handles[0]
 driver.switch_to.window(new_page)
-meeting_title = "SampleMeeting1"
+
+meeting_title = bookings['subject'][0]  # "SampleMeeting1"
 meeting_location = "CT's office"
 meeting_description_opt = "Lorem Ipsum"
 
@@ -84,34 +90,43 @@ else:
         default_day.click()
         time.sleep(2)
 
-choice = 0
-day = begin_date[ : begin_date.find('/')]
-month = begin_date[begin_date.find('/') + 1 : begin_date.rfind('/')]
-year = begin_date[begin_date.rfind('/') + 1 : ]
-choice0_day = day
-choice0_month = month
-choice0_year = year
-
-make_meeting_table_rows = driver.find_elements(By.XPATH,'//table[@id="poll-choice-table"]/tbody/tr')
-for table_row in make_meeting_table_rows:
-    choice_date = table_row.find_element(By.XPATH,".//td[@class='makemeeting-choice-date']")
-    select_day = Select(choice_date.find_element(By.XPATH, ".//select[contains(@id, 'chdate-day')]"))
-    select_month = Select(choice_date.find_element(By.XPATH, ".//select[contains(@id, 'chdate-month')]"))
-    select_year = Select(choice_date.find_element(By.XPATH, ".//select[contains(@id, 'chdate-year')]"))
-    select_day.select_by_value(choice0_day)
-    select_month.select_by_value(choice0_month)
-    select_year.select_by_value(choice0_year)
-
+print("length of dic: ", len(bookings['date']))
 if num_choices_date > 1:
     for i in range(num_choices_date - 1):
         btn_more_choices = driver.find_element(By.XPATH,'//span[@class="mme-add-day"]/input')
         btn_more_choices.click()
         time.sleep(2)
 
+idx = num_choices_date - 1
+make_meeting_table_rows = driver.find_elements(By.XPATH,'//table[@id="poll-choice-table"]/tbody/tr')
+for table_row in make_meeting_table_rows:
+    
+    datestr = bookings['date'][idx]
+    day = datestr[ : datestr.find('/')]
+    month = datestr[datestr.find('/') + 2 : datestr.rfind('/')]
+    year = datestr[datestr.rfind('/') + 1 : ]
+
+    date_el = table_row.find_element(By.XPATH,".//td[@class='makemeeting-choice-date']")
+    day_el = Select(date_el.find_element(By.XPATH, ".//select[contains(@id, 'chdate-day')]"))
+    month_el = Select(date_el.find_element(By.XPATH, ".//select[contains(@id, 'chdate-month')]"))
+    year_el = Select(date_el.find_element(By.XPATH, ".//select[contains(@id, 'chdate-year')]"))
+    day_el.select_by_value(day)
+    month_el.select_by_value(month)
+    year_el.select_by_value(year)
+
+    sugg = table_row.find_element(By.XPATH, ".//input[contains(@id, 'chsuggestions-sugg')]")
+    sugg.send_keys(Keys.RETURN)
+    timestr = bookings['start_time'][idx] + bookings['end_time'][idx]
+    sugg.send_keys(timestr)
+    sugg.send_keys(Keys.TAB)
+
+    idx -= 1
+
 participant_email_checkbox = driver.find_element(by=By.XPATH, value="//input[@type='checkbox' and @id='edit-field-require-email-und']")
 participant_email_checkbox.click()
 time.sleep(2)
 
+"""
 edit_save_button = driver.find_element(by=By.XPATH, value="//input[@type='submit' and @id='edit-submit']")
 edit_save_button.click()
 time.sleep(2)
@@ -136,12 +151,4 @@ send_msg_button.click()
 time.sleep(2)
 submit_button = driver.find_element(by=By.XPATH, value="//input[@type='submit' and @id='edit-submit']")
 submit_button.click()
-
-'''
-sugg = 0
-date1_slot1 = driver.find_element(by=By.ID, value = f"edit-field-mme-makemeeting-und-0-choices-new{choice}-chsuggestions-sugg{sugg}")
-date1_slot1.send_keys(Keys.RETURN)
-date1_slot1.send_keys("09001530")
-time.sleep(2)
-date1_slot1.send_keys(Keys.TAB)
-'''
+"""
