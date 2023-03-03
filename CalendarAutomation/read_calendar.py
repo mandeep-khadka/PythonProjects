@@ -1,6 +1,7 @@
-from exchangelib import Account, Configuration, Credentials, DELEGATE
+from exchangelib import Account, Configuration, Credentials, DELEGATE, EWSTimeZone
 from getpass import getpass
 
+tz_info = EWSTimeZone.localzone() # EWSTimeZone('Europe/Berlin') # EWSTimeZone.localzone()
 class UserAccount:
     domain = "mail.rwth-aachen.de"
     def __init__(self, email, user, password) -> None:
@@ -33,9 +34,11 @@ class UserAccount:
         events = {"subject" : [], "date" : [], "start_time" : [], "end_time" : []}
         for item in calendar_items:
             events["subject"].append(item.subject)
+            start_time = item.start.astimezone(tz_info).strftime('%H:%M')
+            end_time = item.end.astimezone(tz_info).strftime('%H:%M')
             events["date"].append(item.start.strftime('%d/%m/%Y'))
-            events["start_time"].append(item.start.strftime('%H:%M'))
-            events["end_time"].append(item.end.strftime('%H:%M'))
+            events["start_time"].append(start_time) #(item.start.strftime('%H:%M'))
+            events["end_time"].append(end_time) # (item.end.strftime('%H:%M'))
     
         return events
 
@@ -47,7 +50,8 @@ def main():
     account = UserAccount(email, userID, password)
     is_account_valid = account.verify_account()
     if is_account_valid:
-        bookings = account.get_calendar_named_bookings("SampleBlockedSlot")
+        booking_name = input("Enter given name of your booking: ")
+        bookings = account.get_calendar_named_bookings(booking_name)
         print(bookings)
 
 if __name__ == '__main__':

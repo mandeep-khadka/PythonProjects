@@ -18,28 +18,30 @@ userID = input("Enter your User ID: ")                      # e.g. "bk******"
 password = getpass("Enter your password: ")
 
 account = owa.UserAccount(email, userID, password)
+time.sleep(2)
 is_account_valid = account.verify_account()
 if is_account_valid:
-    booking_name = input("Enter given name of your booking: ")  # e.g. "SampleBlockedSlot"
+    print("Congratulations! The connection to mail server is successful!!")
+    time.sleep(1)
+    booking_name = input("Enter given name of your booking: ")  # e.g. "SampleMeeting"
     bookings = account.get_calendar_named_bookings(booking_name)
     print(bookings)
 num_choices_date = len(bookings['date'])
 
-options = Options()
-options.add_experimental_option("detach", True)
-
-driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+### By default the webpage closes after the execution finishes ###
+### The experimental option "detach" passed to the chrome browser keeps the browser open ###
+chrome_options = Options()
+chrome_options.add_experimental_option("detach", True)
+driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
 
 driver.get("https://terminplaner6.dfn.de/")
-driver.maximize_window()
+driver.maximize_window()    # maximize the webpage to the screen window
 
-login = driver.find_element(by=By.ID, value="block-block-9")
-login.click()
-
-# find links in the page
-links = login.find_elements(by=By.TAG_NAME, value="a")
+### Login to terminplanner ###
+login_btn = driver.find_element(by=By.ID, value="block-block-9")
+login_btn.click()
+links = login_btn.find_elements(by=By.TAG_NAME, value="a")
 for link in links:
-    # print(link.text)
     if "LOGIN" in link.text.upper():
         link.click()
         break
@@ -55,17 +57,15 @@ login_button.click()
 
 links = driver.find_elements(by="xpath", value="//a[@href]")
 for link in links:
-    # print(link.get_attribute("innerHTML"))
     if "Buchungsliste" in link.get_attribute("innerHTML") or "meeting" in link.get_attribute("innerHTML"):
         link.click()
-        # print(link.get_attribute("innerHTML"))
         break
 
 time.sleep(1)   # allow the new page to load after clicking
-new_page = driver.window_handles[0]
-driver.switch_to.window(new_page)
+current_window = driver.window_handles[0]  #store the current window
+driver.switch_to.window(current_window)    #switch to the current window
 
-meeting_title = bookings['subject'][0]  # "SampleMeeting1"
+meeting_title = bookings['subject'][0]
 meeting_location = "CT's office"
 meeting_description_opt = "Lorem Ipsum"
 
@@ -103,6 +103,8 @@ for table_row in make_meeting_table_rows:
     
     datestr = bookings['date'][idx]
     day = datestr[ : datestr.find('/')]
+    if day.find('0') == 0:
+        day = day[1:]
     month = datestr[datestr.find('/') + 2 : datestr.rfind('/')]
     year = datestr[datestr.rfind('/') + 1 : ]
 
@@ -126,10 +128,10 @@ participant_email_checkbox = driver.find_element(by=By.XPATH, value="//input[@ty
 participant_email_checkbox.click()
 time.sleep(2)
 
-"""
 edit_save_button = driver.find_element(by=By.XPATH, value="//input[@type='submit' and @id='edit-submit']")
 edit_save_button.click()
 time.sleep(2)
+"""
 new_page = driver.window_handles[0]
 driver.switch_to.window(new_page)
 
