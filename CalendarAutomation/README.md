@@ -1,6 +1,6 @@
 # Calendar Automation
 
-Extract calendar bookings and organize them into meeting invites.
+Automate the process of extracting calendar bookings and organizing them into meeting invites.
 
 ## Description
 
@@ -11,13 +11,14 @@ All the meeting slots booked under a given name in the personal calendar are ext
 ### Dependencies
 
 * OS: Windows, Linux, Mac
-* browser: Chrome, Firefox
+* Browser: Chrome, Firefox
 * Python Libraries: exchangelib, selenium, webdriver_manager (only for Chrome)
 
 ### Installing
 
-* Clone the repo on your local machine
-* Install the necessary Python Libraries mentioned above
+* Clone the repo on your local machine.
+* Install the necessary Python Libraries mentioned above.
+
 e.g.
 ```
 pip install exchangelib
@@ -26,21 +27,23 @@ pip install exchangelib
 ### Executing program
 
 #### How to run the program
-* cd into project home directory
-* Create a virtual environment for the project (Recommended)
+* cd into project home directory.
+* Create a virtual environment for the project (Recommended).
 ```
 python -m venv venv
 ```
-* Activate the virtual environment
+* Activate the virtual environment.
+
 e.g. (On Windows)
 ```
 venv\Scripts\activate
 ```
-* Run the main program
+* Run the main program.
 ```
 python main.py
 ```
-* The program (during execution) requests for several inputs, enter them correctly
+* The program (during the execution) requests for several inputs, enter them correctly.
+
 e.g. terminplanner username and password
 
 ## Help
