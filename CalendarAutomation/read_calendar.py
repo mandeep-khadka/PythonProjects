@@ -1,7 +1,7 @@
 from exchangelib import Account, Configuration, Credentials, DELEGATE, EWSTimeZone
 from getpass import getpass
 
-tz_info = EWSTimeZone.localzone() # EWSTimeZone('Europe/Berlin') # EWSTimeZone.localzone()
+tz_info = EWSTimeZone.localzone() # EWSTimeZone('Europe/Berlin')
 class UserAccount:
     domain = "mail.rwth-aachen.de"
     def __init__(self, email, user, password) -> None:
@@ -42,10 +42,10 @@ class UserAccount:
     
         return events
 
-def main():
-    email = input("Enter your full email address: ")        # e.g. "mandeep.khadka@rwth-aachen.de"
-    userID = input("Enter your User ID: ")                  # e.g. "bk******"
-    password = getpass("Enter your password: ")             # e.g. "top_secret_123"
+def bookings() -> dict:
+    email = input("Enter your full email address (RWTH): ")     # e.g. "john.doe@rwth-aachen.de"
+    password = getpass("Enter your password: ")                 # e.g. "TopSecret123"
+    userID = input("Enter your RWTH user id: ")                 # e.g. "ab123456"
 
     account = UserAccount(email, userID, password)
     is_account_valid = account.verify_account()
@@ -53,6 +53,8 @@ def main():
         booking_name = input("Enter given name of your booking: ")
         bookings = account.get_calendar_named_bookings(booking_name)
         print(bookings)
+    
+    return bookings
 
 if __name__ == '__main__':
-    main()
+    bookings()
