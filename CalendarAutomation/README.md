@@ -22,6 +22,10 @@ All the meeting slots booked under a given name in the personal calendar are ext
 e.g.
 ```
 pip install exchangelib
+
+pip install selenium
+
+pip install webdriver-manager
 ```
 
 ### Executing program
@@ -29,6 +33,8 @@ pip install exchangelib
 #### How to run the program
 * cd into project home directory.
 * Create a virtual environment for the project (Recommended).
+
+e.g. (On Windows)
 ```
 python -m venv venv
 ```
@@ -50,7 +56,7 @@ e.g. terminplanner username and password
 
 Raise issues for any advice or common problems and issues.
 
-## Authors
+## Author
 
 Mandeep Khadka  
 (mandeep.khadka@rwth-aachen.de)
